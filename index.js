@@ -11,8 +11,11 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
 //rutas
-app.use('/api/login',rutas.loginRoutes)
-app.use('/api/signup',rutas.signupRoutes)
+app.use('/api/login',rutas.loginRoutes);
+app.use('/api/signup',rutas.signupRoutes);
+app.use('/api/client',rutas.clientRoutes);
+app.use('/api/proveedor',rutas.proveedoresRoutes);
+app.use('/api/empresa',rutas.empresaRoutes);
 
 const PORT = process.env.PORT || 8081;
 app.listen(PORT, function() {
