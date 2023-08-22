@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Objeto = require('../mongoDB/proveedorSchema');
+const Objeto = require('../mongoDB/puertosSchema');
 const { authenticateToken } = require('../middelwares');
-
 // Ruta para crear un nuevo objeto
 router.post('/',authenticateToken, async (req, res) => {
   try {
@@ -51,7 +50,7 @@ router.put('/:id',authenticateToken, async (req, res) => {
     }
     res.json(objetoActualizado);
   } catch (error) {
-    res.status(500).json({ error: error });
+    res.status(500).json({ error:error});
   }
 });
 

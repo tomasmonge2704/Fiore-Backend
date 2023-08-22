@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Objeto = require('../mongoDB/proveedorSchema');
+const Objeto = require('../mongoDB/paymentTermsSchema');
 const { authenticateToken } = require('../middelwares');
 
 // Ruta para crear un nuevo objeto

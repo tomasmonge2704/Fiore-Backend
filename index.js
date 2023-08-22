@@ -16,7 +16,10 @@ app.use('/api/signup',rutas.signupRoutes);
 app.use('/api/client',rutas.clientRoutes);
 app.use('/api/proveedor',rutas.proveedoresRoutes);
 app.use('/api/empresa',rutas.empresaRoutes);
-
+app.use('/api/packing',rutas.packingRoutes);
+app.use('/api/puertos',rutas.puertosRoutes);
+app.use("/api/payment-terms",rutas.paymentTermsRoutes);
+app.use("/api/products",rutas.productsRoutes);
 const PORT = process.env.PORT || 8081;
 app.listen(PORT, function() {
     console.log('Servidor iniciado en el puerto ' + PORT);

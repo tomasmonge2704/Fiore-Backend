@@ -17,14 +17,6 @@ const proveedorSchema = new mongoose.Schema({
       type: String,
       required: true
     },
-    cuit: {
-      type: String,
-      required: true
-    },
-    origin: {
-      type: String,
-      required: true
-    },
     taxId: {
       type: String,
       required: true
