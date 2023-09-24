@@ -36,22 +36,16 @@ router.get('/:id',authenticateToken, async (req, res) => {
   }
 });
 
-// Ruta para actualizar un objeto por su ID
 router.put('/:id',authenticateToken, async (req, res) => {
   try {
-    let objetoActualizado;
-    if(req.body.state == "nuevo"){
-        req.body._id = undefined;
-        objetoActualizado = await Objeto.create(req.body);
-    }else{
-        objetoActualizado = await Objeto.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    }
+    const objetoActualizado = await Objeto.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!objetoActualizado) {
-      return res.status(404).json({ error: 'Objeto no encontrado' });
+        const nuevoObjeto = await Objeto.create(req.body);
+        res.status(201).json(nuevoObjeto);
     }
     res.json(objetoActualizado);
   } catch (error) {
-    res.status(500).json({ error: error });
+    res.status(500).json({ error: 'Error al actualizar el objeto' });
   }
 });
 

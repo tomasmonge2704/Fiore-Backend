@@ -40,7 +40,8 @@ router.put('/:id',authenticateToken, async (req, res) => {
   try {
     const objetoActualizado = await Objeto.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!objetoActualizado) {
-      return res.status(404).json({ error: 'Objeto no encontrado' });
+        const nuevoObjeto = await Objeto.create(req.body);
+        res.status(201).json(nuevoObjeto);
     }
     res.json(objetoActualizado);
   } catch (error) {
