@@ -7,7 +7,8 @@ const packingRoutes = require("./packing");
 const puertosRoutes = require("./puertos");
 const paymentTermsRoutes = require("./paymentTerms");
 const productsRoutes = require("./products");
-const empleadosRoutes = require("./empleados")
+const empleadosRoutes = require("./empleados");
+const consigneeRoutes = require("./consignee");
 module.exports = {
   loginRoutes,
   signupRoutes,
@@ -18,5 +19,6 @@ module.exports = {
   puertosRoutes,
   paymentTermsRoutes,
   productsRoutes,
-  empleadosRoutes
+  empleadosRoutes,
+  consigneeRoutes
 };
