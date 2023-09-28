@@ -30,7 +30,8 @@ router.get('/new-operation', authenticateToken, async (req, res) => {
     try {
       // Obtener la cantidad de operaciones en la colección ListadoOperaciones
       const cantidadOperaciones = await ListOperations.countDocuments({});
-      operationObjet.comercial.fields.empresaRefNumber = cantidadOperaciones + 1;
+      await ListOperations.create({state:"new",refNumber:String(cantidadOperaciones + 1)});
+      operationObjet.comercial.fields.empresaRefNumber = String(cantidadOperaciones + 1);
       res.status(200).json(operationObjet);
     } catch (error) {
       res.status(500).json({ error: error });

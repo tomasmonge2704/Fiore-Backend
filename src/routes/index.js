@@ -9,6 +9,8 @@ const paymentTermsRoutes = require("./paymentTerms");
 const productsRoutes = require("./products");
 const empleadosRoutes = require("./empleados");
 const consigneeRoutes = require("./consignee");
+const operationRoutes = require("./operation");
+
 module.exports = {
   loginRoutes,
   signupRoutes,
@@ -20,5 +22,6 @@ module.exports = {
   paymentTermsRoutes,
   productsRoutes,
   empleadosRoutes,
-  consigneeRoutes
+  consigneeRoutes,
+  operationRoutes
 };
