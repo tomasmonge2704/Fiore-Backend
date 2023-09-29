@@ -103,6 +103,11 @@ const fieldsDocsSchema = new mongoose.Schema({
 
 // Esquema principal
 const objetoSchema = new mongoose.Schema({
+  id:{
+    type: String,
+    required: true,
+    unique: true
+  },
   comercial: {
     title: String,
     completed: Number,

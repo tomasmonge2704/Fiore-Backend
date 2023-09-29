@@ -49,74 +49,7 @@ router.put('/:id',authenticateToken, async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar el objeto' });
   }
 });
-// Ruta para actualizar los campos "fields" de la sección "Comercial" por ID
-router.put('/comercial/:id', authenticateToken, async (req, res) => {
-    try {
-      const objetoActualizado = await Objeto.findByIdAndUpdate(
-        req.params.id,
-        { 'comercial.fields': req.body },
-        { new: true }
-      );
-      if (!objetoActualizado) {
-        return res.status(404).json({ error: 'Objeto no encontrado' });
-      }
-      res.json(objetoActualizado);
-    } catch (error) {
-      res.status(500).json({ error: 'Error al actualizar la sección Comercial' });
-    }
-  });
-  
-  // Ruta para actualizar los campos "fields" de la sección "Docs" por ID
-  router.put('/docs/:id', authenticateToken, async (req, res) => {
-    try {
-      const objetoActualizado = await Objeto.findByIdAndUpdate(
-        req.params.id,
-        { 'docs.fields': req.body },
-        { new: true }
-      );
-      if (!objetoActualizado) {
-        return res.status(404).json({ error: 'Objeto no encontrado' });
-      }
-      res.json(objetoActualizado);
-    } catch (error) {
-      res.status(500).json({ error: 'Error al actualizar la sección Docs' });
-    }
-  });
-  
-  // Ruta para actualizar los campos "fields" de la sección "Logistica" por ID
-  router.put('/logistica/:id', authenticateToken, async (req, res) => {
-    try {
-      const objetoActualizado = await Objeto.findByIdAndUpdate(
-        req.params.id,
-        { 'logistica.fields': req.body },
-        { new: true }
-      );
-      if (!objetoActualizado) {
-        return res.status(404).json({ error: 'Objeto no encontrado' });
-      }
-      res.json(objetoActualizado);
-    } catch (error) {
-      res.status(500).json({ error: 'Error al actualizar la sección Logistica' });
-    }
-  });
-  
-  // Ruta para actualizar los campos "fields" de la sección "ContableFinanciera" por ID
-  router.put('/contable-financiera/:id', authenticateToken, async (req, res) => {
-    try {
-      const objetoActualizado = await Objeto.findByIdAndUpdate(
-        req.params.id,
-        { 'contableFinanciera.fields': req.body },
-        { new: true }
-      );
-      if (!objetoActualizado) {
-        return res.status(404).json({ error: 'Objeto no encontrado' });
-      }
-      res.json(objetoActualizado);
-    } catch (error) {
-      res.status(500).json({ error: 'Error al actualizar la sección Contable Financiera' });
-    }
-  });
-  
+
 // Ruta para eliminar un objeto por su ID
 router.delete('/:id',authenticateToken, async (req, res) => {
   try {
