@@ -40,27 +40,14 @@ router.get("/new-operation", authenticateToken, async (req, res) => {
     const min = 10000; // El número mínimo de 4 dígitos
     const max = 99999; // El número máximo de 4 dígitos
     const id = String(Math.floor(Math.random() * (max - min + 1)) + min);
-    console.log(id)
     await ListOperations.create({
       state: "new",
       refNumber:id,
     });
     operationObjet.comercial.fields.empresaRefNumber = id;
     operationObjet.id = id;
-    res.status(200).json(operationObjet);
-  } catch (error) {
-    res.status(500).json({ error: error });
-  }
-});
-
-// Ruta para obtener un objeto por su ID
-router.get("/:id", authenticateToken, async (req, res) => {
-  try {
-    const objeto = await Objeto.findById(req.params.id);
-    if (!objeto) {
-      return res.status(404).json({ error: "Objeto no encontrado" });
-    }
-    res.json(objeto);
+    await Objeto.create(operationObjet);
+    res.status(200).json({id:id});
   } catch (error) {
     res.status(500).json({ error: error });
   }
@@ -77,24 +64,6 @@ router.get("/by-ref/:refNumber", authenticateToken, async (req, res) => {
     res.status(500).json({ error: error });
   }
 });
-// Ruta para actualizar un objeto por su ID
-router.put("/:id", authenticateToken, async (req, res) => {
-  try {
-    req.body.status = "Editado"; 
-    const objetoActualizado = await Objeto.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    if (!objetoActualizado) {
-      const nuevoObjeto = await Objeto.create(req.body);
-      res.status(201).json(nuevoObjeto);
-    }
-    res.json(objetoActualizado);
-  } catch (error) {
-    res.status(500).json({ error: "Error al actualizar el objeto" });
-  }
-});
 // Ruta para actualizar un objeto por su refNumber
 router.put("/by-ref/:refNumber", authenticateToken, async (req, res) => {
   try {
@@ -104,10 +73,15 @@ router.put("/by-ref/:refNumber", authenticateToken, async (req, res) => {
       req.body, // Los datos con los que actualizar el documento
       { new: true } // Opciones para devolver el documento actualizado
     );
-    if (!objetoActualizado) {
-      const nuevoObjeto = await Objeto.create(req.body);
-      res.status(201).json(nuevoObjeto);
-    }
+    await ListOperations.findOneAndUpdate(
+      { refNumber: req.params.refNumber },
+      {empleado:req.body.comercial.fields.empleadoBuyer.nombre,
+       shipper:req.body.comercial.fields.seller.nombre,
+       buyer:req.body.comercial.fields.buyer.nombre,
+       empresa:req.body.comercial.fields.empresa.empresa
+      },
+      { new: true }
+    );
     res.json(objetoActualizado);
   } catch (error) {
     res.status(500).json({ error:error});

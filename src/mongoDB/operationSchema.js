@@ -7,7 +7,7 @@ const fieldsComercialSchema = new mongoose.Schema({
   empresaRefNumber: String,
   empleadoBuyer: String,
   empleadoSeller: String,
-  date: Date,
+  date: String,
   empresa: {
     nombre: String,
     empresa: String,
@@ -51,7 +51,7 @@ const fieldsComercialSchema = new mongoose.Schema({
   totalPurchase: Number,
   totalSale: Number,
   totalWeight: Number,
-  productionDate: Date,
+  productionDate: String,
   shelfLife: String,
   destinationPort: String,
   destinationCountry: String,
@@ -66,7 +66,7 @@ const fieldsComercialSchema = new mongoose.Schema({
 
 // Subdocumento para los campos de documentos
 const fieldsDocsSchema = new mongoose.Schema({
-  date: Date,
+  date: String,
   documentRequested: [String],
   instruccionsToIssue: String,
   tipoContenedor: String,
