@@ -67,7 +67,8 @@ router.get("/by-ref/:refNumber", authenticateToken, async (req, res) => {
 // Ruta para actualizar un objeto por su refNumber
 router.put("/by-ref/:refNumber", authenticateToken, async (req, res) => {
   try {
-    req.body.status = "Editado"; 
+    const estado = "En proceso"; 
+    req.body.status = estado;
     const objetoActualizado = await Objeto.findOneAndUpdate(
       { id: req.params.refNumber }, // El campo para buscar el documento
       req.body, // Los datos con los que actualizar el documento
@@ -75,10 +76,11 @@ router.put("/by-ref/:refNumber", authenticateToken, async (req, res) => {
     );
     await ListOperations.findOneAndUpdate(
       { refNumber: req.params.refNumber },
-      {empleado:req.body.comercial.fields.empleadoBuyer.nombre,
+      {empleado:req.body.comercial.fields.empleadoBuyer,
        shipper:req.body.comercial.fields.seller.nombre,
        buyer:req.body.comercial.fields.buyer.nombre,
-       empresa:req.body.comercial.fields.empresa.empresa
+       empresa:req.body.comercial.fields.empresa.empresa,
+       state:estado
       },
       { new: true }
     );

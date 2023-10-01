@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 // Subdocumento para los campos comerciales
 const fieldsComercialSchema = new mongoose.Schema({
@@ -31,6 +31,7 @@ const fieldsComercialSchema = new mongoose.Schema({
     refNumber: String,
   },
   buyer: {
+    nombre:String,
     direccion: String,
     direccion2: String,
     vatNumber: String,
@@ -52,6 +53,7 @@ const fieldsComercialSchema = new mongoose.Schema({
   totalSale: Number,
   totalWeight: Number,
   productionDate: String,
+  operationType:String,
   shelfLife: String,
   destinationPort: String,
   destinationCountry: String,
@@ -67,10 +69,12 @@ const fieldsComercialSchema = new mongoose.Schema({
 // Subdocumento para los campos de documentos
 const fieldsDocsSchema = new mongoose.Schema({
   date: String,
-  documentRequested: [String],
+  documentRequested: [{ label: String, value: String, copias: String }],
+  terminosFlete:String,
   instruccionsToIssue: String,
   tipoContenedor: String,
   descriptionGoods: String,
+  descriptionGoods2: String,
   temperature: String,
   placeBLIssue: String,
   comentarios: String,
@@ -103,10 +107,10 @@ const fieldsDocsSchema = new mongoose.Schema({
 
 // Esquema principal
 const objetoSchema = new mongoose.Schema({
-  id:{
+  id: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   comercial: {
     title: String,
@@ -131,6 +135,6 @@ const objetoSchema = new mongoose.Schema({
   status: String,
 });
 
-const OperationModel = mongoose.model('Operation', objetoSchema);
+const OperationModel = mongoose.model("Operation", objetoSchema);
 
 module.exports = OperationModel;

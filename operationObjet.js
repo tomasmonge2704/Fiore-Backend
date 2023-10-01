@@ -40,6 +40,7 @@ let operationObjet = {
           refNumber: "",
         },
         buyer: {
+          nombre: "",
           direccion: "",
           direccion2: "",
           vatNumber: "",
@@ -60,6 +61,7 @@ let operationObjet = {
         totalPurchase: 0,
         totalSale: 0,
         totalWeight: 0,
+        operationType:"",
         productionDate: "",
         shelfLife: "",
         destinationPort: "",
@@ -82,10 +84,12 @@ let operationObjet = {
         instruccionsToIssue: "",
         tipoContenedor:"",
         descriptionGoods:"",
+        descriptionGoods2:"",
         temperature:"- 18 °C ",
         placeBLIssue:"",
         comentarios:"",
         comentariosSeller:"",
+        terminosFlete:"PREPAID ABROAD",
         consignee:{
           nombre:"",
           direccion:"",
