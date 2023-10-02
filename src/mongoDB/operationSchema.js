@@ -67,6 +67,25 @@ const fieldsComercialSchema = new mongoose.Schema({
 });
 
 // Subdocumento para los campos de documentos
+const fieldsLogisticaSchema = new mongoose.Schema({
+    ShippingLine: String,
+    freightForwarder:String,
+    bookingNr:String,
+    voyageNr:String,
+    insuranceAmount:Number,
+    freightAmount:Number,
+    eta:String,
+    etd:String,
+    vesselName:String,
+    containerNr:String,
+    blNr:String,
+    seals:String,
+    grossWeight:Number,
+    netWeight:Number,
+    quantityCartons:Number,
+    awbNr:String,
+    telexRelease:String
+});
 const fieldsDocsSchema = new mongoose.Schema({
   date: String,
   documentRequested: [{ label: String, value: String, copias: String }],
@@ -104,7 +123,6 @@ const fieldsDocsSchema = new mongoose.Schema({
     taxId: String,
   },
 });
-
 // Esquema principal
 const objetoSchema = new mongoose.Schema({
   id: {
@@ -125,7 +143,7 @@ const objetoSchema = new mongoose.Schema({
   logistica: {
     title: String,
     completed: Number,
-    fields: {},
+    fields:fieldsLogisticaSchema,
   },
   contableFinanciera: {
     title: String,

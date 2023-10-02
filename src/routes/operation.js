@@ -4,6 +4,20 @@ const Objeto = require("../mongoDB/operationSchema");
 const ListOperations = require("../mongoDB/list-operationSchema");
 const operationObjet = require("../../operationObjet");
 const { authenticateToken } = require("../middelwares");
+function calcularDiasHastaFecha(fecha) {
+  const fechaObjetivo = new Date(fecha);
+  const fechaActual = new Date();
+  const diferenciaEnMilisegundos = fechaObjetivo - fechaActual;
+  const diasRestantes = Math.ceil(diferenciaEnMilisegundos / (1000 * 60 * 60 * 24));
+  if (diasRestantes <= 30) {
+    return `${diasRestantes} días`;
+  } else {
+    // Calcula los meses restantes (aproximadamente)
+    const mesesRestantes = Math.floor(diasRestantes / 30);
+    
+    return `${mesesRestantes} meses`;
+  }
+}
 
 // Ruta para crear un nuevo objeto
 router.post("/", authenticateToken, async (req, res) => {
@@ -27,12 +41,35 @@ router.get("/", authenticateToken, async (req, res) => {
 // Ruta para obtener todos los objetos
 router.get("/listado", authenticateToken, async (req, res) => {
   try {
-    const objetos = await ListOperations.find();
+    const objetos = await ListOperations.find().sort({ timestamp: -1 });
     res.json(objetos);
   } catch (error) {
     res.status(500).json({ error: "Error al obtener los objetos" });
   }
 });
+router.get("/orderBy/:param", authenticateToken, async (req, res) => {
+  try {
+    let objetos;
+
+    if (req.params.param === "refNumber") {
+      objetos = await ListOperations.find().sort({ refNumber: -1 }).exec();
+    } else if (req.params.param === "shipper") {
+      objetos = await ListOperations.find().sort({ shipper: 1 }).exec();
+    } else if (req.params.param === "buyer") {
+      objetos = await ListOperations.find().sort({ buyer: 1 }).exec();
+    } else if (req.params.param === "state") {
+      objetos = await ListOperations.find().sort({ state: 1 }).exec();
+    }else if (req.params.param === "date") {
+      objetos = await ListOperations.find().sort({ timestamp: -1 });
+    }else if (req.params.param === "timeToArrival") {
+      objetos = await ListOperations.find().sort({ timestamp: -1 });
+    }
+    res.json(objetos);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener los objetos" });
+  }
+});
+
 // Ruta para obtener los datos de la nueva operación
 router.get("/new-operation", authenticateToken, async (req, res) => {
   try {
@@ -42,12 +79,12 @@ router.get("/new-operation", authenticateToken, async (req, res) => {
     const id = String(Math.floor(Math.random() * (max - min + 1)) + min);
     await ListOperations.create({
       state: "new",
-      refNumber:id,
+      refNumber: id,
     });
     operationObjet.comercial.fields.empresaRefNumber = id;
     operationObjet.id = id;
     await Objeto.create(operationObjet);
-    res.status(200).json({id:id});
+    res.status(200).json({ id: id });
   } catch (error) {
     res.status(500).json({ error: error });
   }
@@ -67,7 +104,7 @@ router.get("/by-ref/:refNumber", authenticateToken, async (req, res) => {
 // Ruta para actualizar un objeto por su refNumber
 router.put("/by-ref/:refNumber", authenticateToken, async (req, res) => {
   try {
-    const estado = "En proceso"; 
+    const estado = "En proceso";
     req.body.status = estado;
     const objetoActualizado = await Objeto.findOneAndUpdate(
       { id: req.params.refNumber }, // El campo para buscar el documento
@@ -76,17 +113,19 @@ router.put("/by-ref/:refNumber", authenticateToken, async (req, res) => {
     );
     await ListOperations.findOneAndUpdate(
       { refNumber: req.params.refNumber },
-      {empleado:req.body.comercial.fields.empleadoBuyer,
-       shipper:req.body.comercial.fields.seller.nombre,
-       buyer:req.body.comercial.fields.buyer.nombre,
-       empresa:req.body.comercial.fields.empresa.empresa,
-       state:estado
+      {
+        empleado: req.body.comercial.fields.empleadoBuyer,
+        shipper: req.body.comercial.fields.seller.nombre,
+        buyer: req.body.comercial.fields.buyer.nombre,
+        empresa: req.body.comercial.fields.empresa.empresa,
+        state: estado,
+        timeToArrival:calcularDiasHastaFecha(req.body.logistica.fields.eta)
       },
       { new: true }
     );
     res.json(objetoActualizado);
   } catch (error) {
-    res.status(500).json({ error:error});
+    res.status(500).json({ error: error });
   }
 });
 // Ruta para eliminar un objeto por su ID
@@ -103,25 +142,28 @@ router.delete("/:id", authenticateToken, async (req, res) => {
 });
 router.delete("/by-ref/:refNumber", authenticateToken, async (req, res) => {
   try {
-    const objetoEliminado = await Objeto.findOneAndDelete({ id: req.params.refNumber });
-const listadoEliminado = await ListOperations.findOneAndDelete({ refNumber: req.params.refNumber });
+    const objetoEliminado = await Objeto.findOneAndDelete({
+      id: req.params.refNumber,
+    });
+    const listadoEliminado = await ListOperations.findOneAndDelete({
+      refNumber: req.params.refNumber,
+    });
 
-const response = {};
+    const response = {};
 
-if (objetoEliminado) {
-  response.message1 = "Objeto eliminado correctamente";
-} else {
-  response.message1 = "Objeto no encontrado";
-}
+    if (objetoEliminado) {
+      response.message1 = "Objeto eliminado correctamente";
+    } else {
+      response.message1 = "Objeto no encontrado";
+    }
 
-if (listadoEliminado) {
-  response.message2 = "Eliminado del listado correctamente";
-} else {
-  response.message2 = "No encontrado en el listado no encontrado";
-}
+    if (listadoEliminado) {
+      response.message2 = "Eliminado del listado correctamente";
+    } else {
+      response.message2 = "No encontrado en el listado no encontrado";
+    }
 
-res.json(response);
-
+    res.json(response);
   } catch (error) {
     res.status(500).json({ error: "Error al eliminar el objeto" });
   }
