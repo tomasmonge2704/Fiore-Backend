@@ -73,19 +73,42 @@ router.get("/orderBy/:param", authenticateToken, async (req, res) => {
 // Ruta para obtener los datos de la nueva operación
 router.get("/new-operation", authenticateToken, async (req, res) => {
   try {
-    // Obtener la cantidad de operaciones en la colección ListadoOperaciones
-    const min = 10000; // El número mínimo de 4 dígitos
-    const max = 99999; // El número máximo de 4 dígitos
-    const id = String(Math.floor(Math.random() * (max - min + 1)) + min);
+    const id = String(210500 + (await ListOperations.find()).length + 1);
+    operationObjet.id = id;
+    operationObjet.comercial.fields.empresaRefNumber = id;
     await ListOperations.create({
-      state: "new",
+      state: "New",
       refNumber: id,
     });
-    operationObjet.comercial.fields.empresaRefNumber = id;
-    operationObjet.id = id;
     await Objeto.create(operationObjet);
     res.status(200).json({ id: id });
   } catch (error) {
+    res.status(500).json({ error: error });
+  }
+});
+router.get("/duplicate/:refNumber", authenticateToken, async (req, res) => {
+  try {
+    const id = String(210500 + (await ListOperations.find()).length + 1);
+    const objetoExistente = await Objeto.findOne({ id: req.params.refNumber });
+    if (!objetoExistente) {
+      return res.status(404).json({ error: "Objeto no encontrado" });
+    }
+    const nuevoObjeto = new Objeto(objetoExistente.toObject());
+    nuevoObjeto.id = id;
+    nuevoObjeto.comercial.fields.empresaRefNumber = id;
+    await nuevoObjeto.save();
+    const response = await ListOperations.create({
+      state: nuevoObjeto.status,
+      refNumber: id,
+      empleado: nuevoObjeto.comercial.fields.empleadoBuyer,
+      shipper:nuevoObjeto.comercial.fields.seller.nombre,
+      buyer: nuevoObjeto.comercial.fields.buyer.nombre,
+      empresa:nuevoObjeto.comercial.fields.empresa.empresa,
+      timeToArrival:calcularDiasHastaFecha(nuevoObjeto.logistica.fields.eta)
+    });
+    res.status(200).json(response);
+  } catch (error) {
+    console.log(error)
     res.status(500).json({ error: error });
   }
 });
@@ -104,8 +127,6 @@ router.get("/by-ref/:refNumber", authenticateToken, async (req, res) => {
 // Ruta para actualizar un objeto por su refNumber
 router.put("/by-ref/:refNumber", authenticateToken, async (req, res) => {
   try {
-    const estado = "En proceso";
-    req.body.status = estado;
     const objetoActualizado = await Objeto.findOneAndUpdate(
       { id: req.params.refNumber }, // El campo para buscar el documento
       req.body, // Los datos con los que actualizar el documento
@@ -114,16 +135,36 @@ router.put("/by-ref/:refNumber", authenticateToken, async (req, res) => {
     await ListOperations.findOneAndUpdate(
       { refNumber: req.params.refNumber },
       {
-        empleado: req.body.comercial.fields.empleadoBuyer,
+        empleado: req.body.docs.fields.responsable,
         shipper: req.body.comercial.fields.seller.nombre,
         buyer: req.body.comercial.fields.buyer.nombre,
         empresa: req.body.comercial.fields.empresa.empresa,
-        state: estado,
+        state: req.body.status,
         timeToArrival:calcularDiasHastaFecha(req.body.logistica.fields.eta)
       },
       { new: true }
     );
     res.json(objetoActualizado);
+  } catch (error) {
+    res.status(500).json({ error: error });
+  }
+});
+// Ruta para actualizar un objeto por su refNumber
+router.put("/by-ref/:refNumber/status", authenticateToken, async (req, res) => {
+  try {
+    const objetoActualizado = await Objeto.findOneAndUpdate(
+      { id: req.params.refNumber }, // El campo para buscar el documento
+      {status:req.body.status}, // Los datos con los que actualizar el documento
+      { new: true } // Opciones para devolver el documento actualizado
+    );
+    await ListOperations.findOneAndUpdate(
+      { refNumber: req.params.refNumber },
+      {
+        state:req.body.status
+      },
+      { new: true }
+    );
+    res.json(objetoActualizado.status);
   } catch (error) {
     res.status(500).json({ error: error });
   }
