@@ -129,6 +129,9 @@ const fieldsDocsSchema = new mongoose.Schema({
     taxId: String,
   },
 });
+const fieldsContableFinanciera = new mongoose.Schema({
+
+})
 // Esquema principal
 const objetoSchema = new mongoose.Schema({
   id: {
@@ -154,7 +157,7 @@ const objetoSchema = new mongoose.Schema({
   contableFinanciera: {
     title: String,
     completed: Number,
-    fields: {},
+    fields:fieldsContableFinanciera,
   },
   status: String,
 });

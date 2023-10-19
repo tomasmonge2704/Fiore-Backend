@@ -1,22 +1,33 @@
 const express = require("express");
 const router = express.Router();
 const Objeto = require("../mongoDB/operationSchema");
-const ListOperations = require("../mongoDB/list-operationSchema");
 const operationObjet = require("../../operationObjet");
 const { authenticateToken } = require("../middelwares");
 function calcularDiasHastaFecha(fecha) {
+  if(!fecha) return "No tiene fecha ETA";
   const fechaObjetivo = new Date(fecha);
   const fechaActual = new Date();
   const diferenciaEnMilisegundos = fechaObjetivo - fechaActual;
   const diasRestantes = Math.ceil(diferenciaEnMilisegundos / (1000 * 60 * 60 * 24));
+  if(diasRestantes < 0) return "Ya arrivo"
   if (diasRestantes <= 30) {
     return `${diasRestantes} días`;
   } else {
     // Calcula los meses restantes (aproximadamente)
     const mesesRestantes = Math.floor(diasRestantes / 30);
-    
     return `${mesesRestantes} meses`;
   }
+}
+function getListado(objetos) {
+  return objetos.map((elemento) => ({
+    status: elemento.status,
+    refNumber: elemento.id,
+    empleado: elemento.comercial.fields.empleadoBuyer,
+    shipper: elemento.comercial.fields.seller.nombre,
+    buyer: elemento.comercial.fields.buyer.nombre,
+    empresa: elemento.comercial.fields.empresa.empresa,
+    timeToArrival:calcularDiasHastaFecha(elemento.logistica.fields.eta)
+  }));
 }
 
 // Ruta para crear un nuevo objeto
@@ -41,45 +52,44 @@ router.get("/", authenticateToken, async (req, res) => {
 // Ruta para obtener todos los objetos
 router.get("/listado", authenticateToken, async (req, res) => {
   try {
-    const objetos = await ListOperations.find().sort({ timestamp: -1 });
-    res.json(objetos);
+    const objetos = await Objeto.find({});
+    const listado = getListado(objetos).sort((a, b) => b.refNumber - a.refNumber);
+    res.json(listado);
   } catch (error) {
     res.status(500).json({ error: "Error al obtener los objetos" });
   }
+  
 });
 router.get("/orderBy/:param", authenticateToken, async (req, res) => {
   try {
-    let objetos;
-
+    let objetos = await Objeto.find().sort({ timestamp: -1 });
+    const listado = getListado(objetos);
     if (req.params.param === "refNumber") {
-      objetos = await ListOperations.find().sort({ refNumber: -1 }).exec();
+      objetos = listado.sort((a, b) => b.refNumber - a.refNumber);
     } else if (req.params.param === "shipper") {
-      objetos = await ListOperations.find().sort({ shipper: 1 }).exec();
+      objetos = listado.sort((a, b) => a.shipper.localeCompare(b.shipper));
     } else if (req.params.param === "buyer") {
-      objetos = await ListOperations.find().sort({ buyer: 1 }).exec();
-    } else if (req.params.param === "state") {
-      objetos = await ListOperations.find().sort({ state: 1 }).exec();
-    }else if (req.params.param === "date") {
-      objetos = await ListOperations.find().sort({ timestamp: -1 });
-    }else if (req.params.param === "timeToArrival") {
-      objetos = await ListOperations.find().sort({ timestamp: -1 });
+      objetos = listado.sort((a, b) => a.buyer.localeCompare(b.buyer));
+    } else if (req.params.param === "status") {
+      objetos = listado.sort((a, b) => a.status.localeCompare(b.status));
+    } else if (req.params.param === "date") {
+      objetos = listado.sort((a, b) => b.timestamp - a.timestamp);
+    } else if (req.params.param === "timeToArrival") {
+      objetos = listado.sort((a, b) => b.timestamp - a.timestamp);
     }
     res.json(objetos);
   } catch (error) {
     res.status(500).json({ error: "Error al obtener los objetos" });
-  }
+  }  
 });
 
 // Ruta para obtener los datos de la nueva operación
 router.get("/new-operation", authenticateToken, async (req, res) => {
   try {
-    const id = String(210500 + (await ListOperations.find()).length + 1);
+    let objetos = await Objeto.find({});
+    const id = String(210500 + objetos.length + 1);
     operationObjet.id = id;
     operationObjet.comercial.fields.empresaRefNumber = id;
-    await ListOperations.create({
-      state: "New",
-      refNumber: id,
-    });
     await Objeto.create(operationObjet);
     res.status(200).json({ id: id });
   } catch (error) {
@@ -88,25 +98,23 @@ router.get("/new-operation", authenticateToken, async (req, res) => {
 });
 router.get("/duplicate/:refNumber", authenticateToken, async (req, res) => {
   try {
-    const id = String(210500 + (await ListOperations.find()).length + 1);
+    let objetos = await Objeto.find({});
+    const id = String(210500 + objetos.length + 1);
     const objetoExistente = await Objeto.findOne({ id: req.params.refNumber });
     if (!objetoExistente) {
       return res.status(404).json({ error: "Objeto no encontrado" });
     }
-    const nuevoObjeto = new Objeto(objetoExistente.toObject());
-    nuevoObjeto.id = id;
-    nuevoObjeto.comercial.fields.empresaRefNumber = id;
-    await nuevoObjeto.save();
-    const response = await ListOperations.create({
-      state: nuevoObjeto.status,
-      refNumber: id,
-      empleado: nuevoObjeto.comercial.fields.empleadoBuyer,
-      shipper:nuevoObjeto.comercial.fields.seller.nombre,
-      buyer: nuevoObjeto.comercial.fields.buyer.nombre,
-      empresa:nuevoObjeto.comercial.fields.empresa.empresa,
-      timeToArrival:calcularDiasHastaFecha(nuevoObjeto.logistica.fields.eta)
-    });
-    res.status(200).json(response);
+    const duplicatedObject = new Objeto(objetoExistente.toObject());
+    duplicatedObject.id = id;
+    duplicatedObject.comercial.fields.empresaRefNumber = id;
+    duplicatedObject._id = undefined;
+    duplicatedObject.comercial.fields._id = undefined;
+    duplicatedObject.docs.fields._id = undefined;
+    duplicatedObject.logistica.fields._id = undefined;
+    duplicatedObject.contableFinanciera.fields._id = undefined;
+    const response = await duplicatedObject.save();
+    await duplicatedObject.save();
+    res.status(200).json(getListado([response])[0]);
   } catch (error) {
     console.log(error)
     res.status(500).json({ error: error });
@@ -132,18 +140,6 @@ router.put("/by-ref/:refNumber", authenticateToken, async (req, res) => {
       req.body, // Los datos con los que actualizar el documento
       { new: true } // Opciones para devolver el documento actualizado
     );
-    await ListOperations.findOneAndUpdate(
-      { refNumber: req.params.refNumber },
-      {
-        empleado: req.body.docs.fields.responsable,
-        shipper: req.body.comercial.fields.seller.nombre,
-        buyer: req.body.comercial.fields.buyer.nombre,
-        empresa: req.body.comercial.fields.empresa.empresa,
-        state: req.body.status,
-        timeToArrival:calcularDiasHastaFecha(req.body.logistica.fields.eta)
-      },
-      { new: true }
-    );
     res.json(objetoActualizado);
   } catch (error) {
     res.status(500).json({ error: error });
@@ -156,13 +152,6 @@ router.put("/by-ref/:refNumber/status", authenticateToken, async (req, res) => {
       { id: req.params.refNumber }, // El campo para buscar el documento
       {status:req.body.status}, // Los datos con los que actualizar el documento
       { new: true } // Opciones para devolver el documento actualizado
-    );
-    await ListOperations.findOneAndUpdate(
-      { refNumber: req.params.refNumber },
-      {
-        state:req.body.status
-      },
-      { new: true }
     );
     res.json(objetoActualizado.status);
   } catch (error) {
@@ -186,25 +175,7 @@ router.delete("/by-ref/:refNumber", authenticateToken, async (req, res) => {
     const objetoEliminado = await Objeto.findOneAndDelete({
       id: req.params.refNumber,
     });
-    const listadoEliminado = await ListOperations.findOneAndDelete({
-      refNumber: req.params.refNumber,
-    });
-
-    const response = {};
-
-    if (objetoEliminado) {
-      response.message1 = "Objeto eliminado correctamente";
-    } else {
-      response.message1 = "Objeto no encontrado";
-    }
-
-    if (listadoEliminado) {
-      response.message2 = "Eliminado del listado correctamente";
-    } else {
-      response.message2 = "No encontrado en el listado no encontrado";
-    }
-
-    res.json(response);
+    res.json(objetoEliminado);
   } catch (error) {
     res.status(500).json({ error: "Error al eliminar el objeto" });
   }
