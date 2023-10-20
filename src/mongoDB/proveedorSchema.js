@@ -28,6 +28,9 @@ const proveedorSchema = new mongoose.Schema({
     brand: {
       type: String,
       required: true
+    },
+    emoji:{
+      type:String
     }
   });
 

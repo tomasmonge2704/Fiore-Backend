@@ -20,6 +20,9 @@ const clientSchema = new mongoose.Schema({
   vatNumber: {
     type: String,
     required: true
+  },
+  emoji:{
+    type:String
   }
 });
 
