@@ -51,7 +51,7 @@ let operationObjet = {
           id: "",
           description: "",
           packing: "",
-          quantity: "",
+          quantity:1,
           quantityCartons:0,
           netWeight:0,
           grossWeight:0,
