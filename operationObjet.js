@@ -36,7 +36,7 @@ let operationObjet = {
         direccion: "",
         direccion2: "",
         pais: "",
-        cuit: "",
+        taxId: "",
         refNumber: "",
         plantNumber:"",
         brand:""
