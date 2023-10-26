@@ -29,6 +29,8 @@ const fieldsComercialSchema = new mongoose.Schema({
     pais: String,
     cuit: String,
     refNumber: String,
+    plantNumber:String,
+    brand:String
   },
   buyer: {
     nombre:String,

@@ -38,6 +38,8 @@ let operationObjet = {
         pais: "",
         cuit: "",
         refNumber: "",
+        plantNumber:"",
+        brand:""
       },
       buyer: {
         nombre: "",
