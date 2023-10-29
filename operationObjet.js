@@ -36,8 +36,10 @@ let operationObjet = {
         direccion: "",
         direccion2: "",
         pais: "",
-        cuit: "",
+        taxId: "",
         refNumber: "",
+        plantNumber:"",
+        brand:""
       },
       buyer: {
         nombre: "",
@@ -51,7 +53,7 @@ let operationObjet = {
           id: "",
           description: "",
           packing: "",
-          quantity: "",
+          quantity:1,
           quantityCartons:0,
           netWeight:0,
           grossWeight:0,
