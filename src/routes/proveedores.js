@@ -40,12 +40,13 @@ router.get('/:id',authenticateToken, async (req, res) => {
 router.put('/:id',authenticateToken, async (req, res) => {
   try {
     if(req.body._id == "new"){
+      req.body._id = undefined;
       return res.status(201).json(await Objeto.create(req.body));
     }
     const objetoActualizado = await Objeto.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(objetoActualizado);
   } catch (error) {
-    res.status(500).json({ error: 'Error al actualizar el objeto' });
+    res.status(500).json({ error:error});
   }
 });
 
