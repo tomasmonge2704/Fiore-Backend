@@ -20,6 +20,7 @@ const fieldsComercialSchema = new mongoose.Schema({
       swiftCode: String,
       beneficiaryName: String,
       beneficiaryAccountNumber: String,
+      correspondentBank:String
     },
   },
   seller: {

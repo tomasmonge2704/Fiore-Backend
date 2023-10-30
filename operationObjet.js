@@ -29,6 +29,7 @@ let operationObjet = {
           swiftCode: "",
           beneficiaryName: "",
           beneficiaryAccountNumber: "",
+          correspondentBank:""
         },
       },
       seller: {
