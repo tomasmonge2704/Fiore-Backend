@@ -10,6 +10,7 @@ const productsRoutes = require("./products");
 const empleadosRoutes = require("./empleados");
 const consigneeRoutes = require("./consignee");
 const operationRoutes = require("./operation");
+const forwarderRoutes = require("./forwarders");
 
 module.exports = {
   loginRoutes,
@@ -23,5 +24,6 @@ module.exports = {
   productsRoutes,
   empleadosRoutes,
   consigneeRoutes,
-  operationRoutes
+  operationRoutes,
+  forwarderRoutes
 };
