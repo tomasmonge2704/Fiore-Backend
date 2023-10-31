@@ -75,6 +75,7 @@ const fieldsComercialSchema = new mongoose.Schema({
   paymentTermsSale: String,
   paymentTermsPurchase: String,
   exportTo: String,
+  comentarios:String
 });
 
 // Subdocumento para los campos de documentos

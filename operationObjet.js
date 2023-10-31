@@ -84,6 +84,7 @@ let operationObjet = {
       paymentTermsSale: "",
       paymentTermsPurchase: "",
       exportTo: "",
+      comentarios:""
     },
   },
   docs: {
