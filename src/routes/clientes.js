@@ -5,10 +5,15 @@ const { authenticateToken } = require('../middelwares');
 // Ruta para crear un nuevo objeto
 router.post('/',authenticateToken, async (req, res) => {
   try {
+    for (const key in req.body) {
+      if (typeof req.body[key] === 'string' && req.body[key].trim() === '') {
+        throw new Error(`El parámetro ${key} está vacío`);
+      }
+    }
     const nuevoObjeto = await Objeto.create(req.body);
     res.status(201).json(nuevoObjeto);
   } catch (error) {
-    res.status(500).json({ error: error });
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -38,14 +43,15 @@ router.get('/:id',authenticateToken, async (req, res) => {
 // Ruta para actualizar un objeto por su ID
 router.put('/:id',authenticateToken, async (req, res) => {
   try {
-    if(req.body._id == "new"){
-      req.body._id = undefined;
-      return res.status(201).json(await Objeto.create(req.body));
+    for (const key in req.body) {
+      if (typeof req.body[key] === 'string' && req.body[key].trim() === '') {
+        throw new Error(`El parámetro ${key} está vacío`);
+      }
     }
     const objetoActualizado = await Objeto.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(objetoActualizado);
   } catch (error) {
-    res.status(500).json({ error:error });
+    res.status(500).json({ error: error.message });
   }
 });
 

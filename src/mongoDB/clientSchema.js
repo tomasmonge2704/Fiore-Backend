@@ -3,46 +3,26 @@ const mongoose = require('mongoose');
 const clientSchema = new mongoose.Schema({
   nombre: {
     type: String,
-    required: true,
-    validate: {
-      validator: (value) => value.trim().length > 0, // Valida que no esté vacío
-      message: 'El campo "nombre" no puede estar vacío.'
-    }
+    required: true
   },
   direccion: {
     type: String,
-    required: true,
-    validate: {
-      validator: (value) => value.trim().length > 0, // Valida que no esté vacío
-      message: 'El campo "direccion" no puede estar vacío.'
-    }
+    required: true
   },
   direccion2: {
     type: String,
-    required: true,
-    validate: {
-      validator: (value) => value.trim().length > 0, // Valida que no esté vacío
-      message: 'El campo "direccion2" no puede estar vacío.'
-    }
+    required: true
   },
   country: {
     type: String,
-    required: true,
-    validate: {
-      validator: (value) => value.trim().length > 0, // Valida que no esté vacío
-      message: 'El campo "country" no puede estar vacío.'
-    }
+    required: true
   },
   vatNumber: {
     type: String,
-    required: true,
-    validate: {
-      validator: (value) => value.trim().length > 0, // Valida que no esté vacío
-      message: 'El campo "vatNumber" no puede estar vacío.'
-    }
+    required: true
   },
-  emoji: {
-    type: String
+  emoji:{
+    type:String
   }
 });
 
