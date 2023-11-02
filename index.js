@@ -24,6 +24,8 @@ app.use("/api/products",rutas.productsRoutes);
 app.use("/api/consignee",rutas.consigneeRoutes);
 app.use("/api/operation",rutas.operationRoutes);
 app.use("/api/forwarder",rutas.forwarderRoutes);
+app.use("/api/shipping-line",rutas.shippingLineRoutes);
+
 const PORT = process.env.PORT || 8081;
 app.listen(PORT, function() {
     console.log('Servidor iniciado en el puerto ' + PORT);

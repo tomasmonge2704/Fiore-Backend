@@ -7,4 +7,4 @@ const objSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('forwarders', objSchema);
+module.exports = mongoose.model('shipping-line', objSchema);
