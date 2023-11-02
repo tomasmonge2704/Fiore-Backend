@@ -70,6 +70,8 @@ const fieldsComercialSchema = new mongoose.Schema({
   destinationCountry: String,
   quantity: Number,
   shipmentPeriod: String,
+  shipmentPeriodTo: String,
+  shipmentPeriodFrom: String,
   deliveryTermsSale: String,
   deliveryTermsPurchase: String,
   paymentTermsSale: String,
